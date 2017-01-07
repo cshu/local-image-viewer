@@ -1,0 +1,99 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<title>Local Image Viewer</title>
+<script src="bundle.js"></script>
+</head>
+<body>
+<!--tried accept="image/*", doesn't work-->
+<input id="fileelem" type="file" webkitdirectory directory /><!--//note webkitdirectory will be renamed to directory?-->
+<table style="width:100%;min-height:35px"><tr>
+<td><input type="button" style="width:100%;height:40px;background-color:white" value="Previous" onclick="showPrev()" /></td>
+<!--<td style="width:50%"><input type="button" style="width:100%;height:100%;background-color:white" value="Next" onclick="showNext()" /></td>-->
+</tr>
+<tr><td><img id="imgelem" /></td></tr>
+<tr>
+<td><input type="button" style="width:100%;height:40px;background-color:white" value="Previous" onclick="showPrev()" /></td>
+<!--<td style="width:50%"><input type="button" style="width:100%;height:100%;background-color:white" value="Next" onclick="showNext()" /></td>-->
+</tr></table>
+<script type="text/javascript">
+var settings = {fnmpattern:/\.(bmp|gif|jpeg|jpg|png|svg|tif|tiff)$/i};//svg and tiff are not supported?
+//todo feature: after a folder is selected, show file list (don't show img). the user choose a file among the list.
+//todo feature: options can be set by a js var, e.g. image size (original size, fit height, etc.), order of moving images (manga order, comic order, etc.), color used to fill background space
+//todo feature: show full path of folder, is it possible?
+//todo feature: intelligent sort, detecting the filename naming order in intuitive way for human (e.g. .1 .2 ... .14 .15)
+
+//undone also some buttons for jump 1% pages?
+//undone jump to numbered page?
+
+
+if(document.getElementById('fileelem').webkitdirectory===undefined) alert('This browser is not supported!');
+
+//an alternative is to use FileReader.readAsDataURL, which is likely to be slower?
+//note resolveLocalFileSystemURL (or webkitResolveLocalFileSystemURL) is not an alternative, bc it only works for sandboxed filesystem?
+var imgelem = document.getElementById('imgelem');
+imgelem.onload=function(){
+	URL.revokeObjectURL(this.src);
+	window.scroll(document.body.scrollWidth,0);
+};
+function showMore(){
+	var wh =document.documentElement.clientHeight;
+	var wsy=window.scrollY;
+	window.scrollBy(0,wh/3*2);
+	if(wsy!==window.scrollY) return;
+	var ww =document.documentElement.clientWidth;
+	var wsx=window.scrollX;
+	window.scrollBy(-ww/3*2,0);
+	if(wsx!==window.scrollX) {window.scroll(window.scrollX,0); return;}
+	showNext();
+}
+var lst;
+var fileind;
+document.getElementById('fileelem').onchange=function(){
+	//magical fix for firefox blur bug:
+	document.getElementsByTagName('input')[1].focus();document.getElementsByTagName('input')[1].blur();
+
+	if(this.files.length>0x10000) {alert('Too many files'); return;}
+	var newlst=makeArray(this.files).filter(function(element){return settings.fnmpattern.test(element.name);});
+	if(newlst.length===0) {alert('No image files'); return;}
+	lst=newlst;
+	lst.sort(cmpWebkitRelativePathFile);
+	//undone add list of files for selection
+
+	fileind=0;
+	updateImgNDocTitle();
+}
+function updateImgNDocTitle(){
+	imgelem.src=URL.createObjectURL(lst[fileind]);
+	document.title=fileind+1+'/'+lst.length+' '+lst[fileind].webkitRelativePath;
+}
+function showNext(){
+	if(fileind===undefined || fileind===lst.length-1) return;
+	++fileind;
+	updateImgNDocTitle();
+}
+function showPrev(){
+	if(fileind===undefined || fileind===0) return;
+	--fileind;
+	updateImgNDocTitle();
+}
+document.onclick=function(evt){
+	if(evt.target.tagName==='INPUT') return;
+	showMore();
+}
+document.onkeydown=function(ke){
+	switch(ke.keyCode){
+	case 13://enter
+	case 32://space
+		showMore();
+		break;
+	case 109://-
+		showPrev();
+		break;
+	}
+	return false;
+}
+
+
+
+
+</script>
+</body></html>
