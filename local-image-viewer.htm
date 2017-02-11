@@ -9,7 +9,7 @@
 <td><input type="button" style="width:100%;height:40px;background-color:white" value="Previous" onclick="showPrev()" /></td>
 <!--<td style="width:50%"><input type="button" style="width:100%;height:100%;background-color:white" value="Next" onclick="showNext()" /></td>-->
 </tr>
-<tr><td><img id="imgelem" /></td></tr>
+<tr><td><img id="imgelem" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="" /></td></tr>
 <tr>
 <td><input type="button" style="width:100%;height:40px;background-color:white" value="Previous" onclick="showPrev()" /></td>
 <!--<td style="width:50%"><input type="button" style="width:100%;height:100%;background-color:white" value="Next" onclick="showNext()" /></td>-->
@@ -31,6 +31,7 @@ if(document.getElementById('fileelem').webkitdirectory===undefined) alert('This 
 //note resolveLocalFileSystemURL (or webkitResolveLocalFileSystemURL) is not an alternative, bc it only works for sandboxed filesystem?
 var imgelem = document.getElementById('imgelem');
 imgelem.onload=function(){
+	if(this.src==="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=")return;
 	URL.revokeObjectURL(this.src);
 	window.scroll(document.body.scrollWidth,0);
 };
