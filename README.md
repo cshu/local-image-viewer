@@ -1,2 +1,2 @@
 # local-image-viewer
-Press **Enter** or **Space** to proceed. Press **-** to go back.
+Press **Enter** or **Space** to proceed. Press **- (Numpad)** or **,** to go back.
